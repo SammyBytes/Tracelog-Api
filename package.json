@@ -3,24 +3,13 @@
   "target": "ESNext",
   "module": "ESNext",
   "moduleResolution": "bundler",
-  "baseUrl": ".",
   "scripts": {
     "dev": "wrangler dev",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
-  "paths": {
-    "@core/*": [
-      "src/core/*"
-    ],
-    "@db/*": [
-      "src/db/*"
-    ],
-    "@modules/*": [
-      "src/modules/*"
-    ]
-  },
+
   "devDependencies": {
     "@types/bun": "latest",
     "drizzle-kit": "^0.31.8",
