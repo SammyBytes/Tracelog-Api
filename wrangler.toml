@@ -1,0 +1,6 @@
+name = "trace-log-api"
+main = "src/index.ts"
+compatibility_date = "2026-01-21"
+
+[vars]
+TURSO_URL = "libsql://tracelog-sammybits.aws-us-east-1.turso.io"
