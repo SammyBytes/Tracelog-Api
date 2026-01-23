@@ -1,7 +1,10 @@
 import { Hono } from "hono";
 import type { Bindings } from "./types";
+import routes from "./routes";
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+app.route("/api", routes);
 
 app.get("/", (c) => {
   return c.json({
