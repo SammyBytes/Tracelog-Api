@@ -10,5 +10,9 @@ export const createProject = async (
   db: DatabaseOrTransaction,
   data: typeof projects.$inferInsert,
 ) => {
-  return await db.insert(projects).values(data).returning();
+  return await db
+    .insert(projects)
+    .values(data)
+    .onConflictDoNothing()
+    .returning();
 };
