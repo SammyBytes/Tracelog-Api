@@ -21,7 +21,7 @@ jobs:
             },
             "hash": "${{ github.event.pull_request.merge_commit_sha }}",
             "author": {
-              "email": "${{ github.event.pull_request.user.email }}",
+              "id": "${{ github.event.pull_request.user.id }}",
               "name": "${{ github.event.pull_request.user.login }}",
               "avatarUrl": "${{ github.event.pull_request.user.avatar_url }}"
             },
