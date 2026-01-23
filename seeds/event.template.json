@@ -1,0 +1,20 @@
+{
+  "action": "closed",
+  "pull_request": {
+    "merged": true,
+    "number": 1,
+    "title": "feat(auth): Support multiple login methods",
+    "merge_commit_sha": "sha_de_prueba_128",
+    "merged_at": "2025-01-23T20:00:00Z",
+    "user": {
+      "email": "test@example.com",
+      "login": "test",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12345"
+    }
+  },
+  "repository": {
+    "id": 12345678,
+    "name": "tracelog",
+    "html_url": "https://github.com/octopus/tracelog"
+  }
+}

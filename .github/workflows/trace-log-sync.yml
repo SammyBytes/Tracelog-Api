@@ -1,0 +1,36 @@
+name: Trace-Log Sync
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop, main]
+
+jobs:
+  sync:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send to Trace-Log
+        run: |
+          # Build payload
+          cat <<EOF > payload.json
+          {
+            "project": {
+              "id": "${{ github.event.repository.id }}",
+              "name": "${{ github.event.repository.name }}",
+              "url": "${{ github.event.repository.html_url }}"
+            },
+            "hash": "${{ github.event.pull_request.merge_commit_sha }}",
+            "author": {
+              "email": "${{ github.event.pull_request.user.email }}",
+              "name": "${{ github.event.pull_request.user.login }}",
+              "avatarUrl": "${{ github.event.pull_request.user.avatar_url }}"
+            },
+            "fullMessage": "${{ github.event.pull_request.title }}",
+            "prNumber": ${{ github.event.pull_request.number }},
+            "files": []
+          }
+          EOF
+
+          curl -X POST "${{ secrets.API_URL }}" \
+          -H "Content-Type: application/json" \
+          -d @payload.json

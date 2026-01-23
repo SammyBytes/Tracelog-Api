@@ -6,14 +6,14 @@ export const GitHubSyncSchema = z.object({
     name: z.string(),
     url: z.url(),
   }),
-  hash: z.string(),
+  hash: z.string(), // Merge hash of the PR
   author: z.object({
     email: z.email(),
     name: z.string(),
-    avatarUrl: z.url().optional(),
+    avatarUrl: z.url().optional().or(z.literal("")),
   }),
-  fullMessage: z.string(), // "feat(auth): add login"
-  prNumber: z.number().optional(),
+  fullMessage: z.string().min(5), // "feat(auth): add login"
+  prNumber: z.number().positive(),
   files: z
     .array(
       z.object({
