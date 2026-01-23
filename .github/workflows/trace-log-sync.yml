@@ -2,7 +2,7 @@ name: Trace-Log Sync
 on:
   pull_request:
     types: [closed]
-    branches: [develop, main]
+    branches: [dev, main]
 
 jobs:
   sync:
