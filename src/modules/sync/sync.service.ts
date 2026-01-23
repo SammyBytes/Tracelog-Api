@@ -20,7 +20,7 @@ export const syncGithubPayload = async (
     });
 
     await createAuthor(tx, {
-      email: input.author.email,
+      id: input.author.id,
       name: input.author.name,
       avatarUrl: input.author.avatarUrl,
     });
@@ -28,7 +28,7 @@ export const syncGithubPayload = async (
     await createCommit(tx, {
       hash: input.hash,
       projectId: input.project.id,
-      authorEmail: input.author.email,
+      authorId: input.author.id,
       type,
       module,
       message,
