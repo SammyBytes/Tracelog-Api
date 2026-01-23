@@ -1,5 +1,6 @@
 import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
 import { ulid } from "ulid";
+import type { id } from "zod/v4/locales";
 
 /**
  * Database schema definition for Tracelog application
@@ -16,7 +17,7 @@ export const projects = sqliteTable("projects", {
  * Authors of commits
  */
 export const authors = sqliteTable("authors", {
-  email: text("email").primaryKey(),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
 });
@@ -26,7 +27,7 @@ export const authors = sqliteTable("authors", {
 export const commits = sqliteTable("commits", {
   hash: text("hash").primaryKey(),
   projectId: text("project_id").references(() => projects.id),
-  authorEmail: text("author_email").references(() => authors.email),
+  authorId: text("author_id").references(() => authors.id),
 
   // Analize message: feat(auth): add login
   type: text("type"), // feat, fix, refactor, etc.

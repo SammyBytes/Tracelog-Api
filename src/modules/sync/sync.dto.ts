@@ -8,7 +8,7 @@ export const GitHubSyncSchema = z.object({
   }),
   hash: z.string(), // Merge hash of the PR
   author: z.object({
-    email: z.email(),
+    id: z.string(),
     name: z.string(),
     avatarUrl: z.url().optional().or(z.literal("")),
   }),
