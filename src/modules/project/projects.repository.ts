@@ -1,5 +1,5 @@
 import { projects } from "@db/schema";
-import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import type { DatabaseOrTransaction } from "@db/types";
 /**
  * Create a new project in the database
  * @param db LibSQLDatabase instance
@@ -7,7 +7,7 @@ import type { LibSQLDatabase } from "drizzle-orm/libsql";
  * @returns Newly created project
  */
 export const createProject = async (
-  db: LibSQLDatabase,
+  db: DatabaseOrTransaction,
   data: typeof projects.$inferInsert,
 ) => {
   return await db.insert(projects).values(data).returning();

@@ -1,5 +1,5 @@
 import { commits } from "@db/schema";
-import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import type { DatabaseOrTransaction } from "@db/types";
 
 /**
  * Create a new commit in the database
@@ -8,7 +8,7 @@ import type { LibSQLDatabase } from "drizzle-orm/libsql";
  * @returns Newly created commit
  */
 export const createCommit = async (
-  db: LibSQLDatabase,
+  db: DatabaseOrTransaction,
   data: typeof commits.$inferInsert,
 ) => {
   return await db.insert(commits).values(data).onConflictDoNothing();

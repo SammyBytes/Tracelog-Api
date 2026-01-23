@@ -1,5 +1,5 @@
 import { authors } from "@db/schema";
-import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import type { DatabaseOrTransaction } from "@db/types";
 /**
  * Create a new author in the database
  * @param db LibSQLDatabase instance
@@ -7,7 +7,7 @@ import type { LibSQLDatabase } from "drizzle-orm/libsql";
  * @returns Newly created author
  */
 export const createAuthor = async (
-  db: LibSQLDatabase,
+  db: DatabaseOrTransaction,
   data: typeof authors.$inferInsert,
 ) => {
   return await db.insert(authors).values(data).onConflictDoNothing();

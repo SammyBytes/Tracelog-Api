@@ -5,7 +5,7 @@ import { ulid } from "ulid";
  * Database schema definition for Tracelog application
  */
 export const projects = sqliteTable("projects", {
-  id: text("id").primaryKey().default(ulid()),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   url: text("url"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
