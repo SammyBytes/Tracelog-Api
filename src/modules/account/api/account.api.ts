@@ -4,37 +4,48 @@ import type { Bindings, Variables } from "src/types";
 import { AccountRequestSchema } from "../accountRequest.dto";
 import { create } from "../account.repository";
 import { generateTracelogKey } from "../utils/crypto.utils";
+import { validator } from "hono/validator";
+import z from "zod";
+import type { NewAccount } from "@db/types";
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-app.post("/", async (c) => {
-  const payload = await c.req.json();
-  if (!payload) {
-    return c.json({ error: "Invalid payload" }, 400);
-  }
+app.post(
+  "/",
+  validator("json", (value, c) => {
+    const parsed = AccountRequestSchema.safeParse(value);
+    if (!parsed.success) {
+      return c.json({ error: z.formatError(parsed.error) }, 400);
+    }
+    return parsed.data;
+  }),
+  async (c) => {
+    const data = c.req.valid("json");
 
-  const { data, success, error } =
-    await AccountRequestSchema.safeParseAsync(payload);
+    console.debug("Received payload:", data);
 
-  if (!success) {
-    return c.json({ error: error.message }, 400);
-  }
+    const apiKey = generateTracelogKey();
 
-  console.debug("Received payload:", data);
+    const accountToInsert: NewAccount = {
+      ...data,
+      apiKeyHash: apiKey,
+    };
 
-  const fullPayload = {
-    ...payload,
-    apiKeyHash: generateTracelogKey(),
-  };
-
-  try {
-    const database = db(c.env);
-    const result = await create(database, fullPayload);
-    return c.json(result);
-  } catch (error) {
-    console.error("Error creating account:", error);
-    return c.json({ error: "Failed to create account" }, 500);
-  }
-});
+    try {
+      const database = db(c.env);
+      const result = await create(database, accountToInsert);
+      return c.json(
+        {
+          account: result,
+          apiKey: apiKey,
+        },
+        201,
+      );
+    } catch (error) {
+      console.error("Error creating account:", error);
+      return c.json({ error: "Failed to create account" }, 500);
+    }
+  },
+);
 
 export default app;

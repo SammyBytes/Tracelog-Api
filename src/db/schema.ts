@@ -1,7 +1,11 @@
 import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
 
+import { ulid } from "ulid";
+
 export const accounts = sqliteTable("accounts", {
-  id: text("id").primaryKey(), // Id of the account (User ID or Organization ID)
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => ulid()),
   name: text("name").notNull(),
   type: text("type").notNull(), // user or organization
   url: text("url"),

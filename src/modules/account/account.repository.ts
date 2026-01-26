@@ -3,11 +3,13 @@ import type { DatabaseOrTransaction, NewAccount } from "@db/types";
 import { accounts } from "@db/schema";
 
 export const create = async (db: DatabaseOrTransaction, data: NewAccount) => {
-  return await db
+  var result = await db
     .insert(accounts)
     .values(data)
     .onConflictDoNothing()
     .returning();
+
+  return result.length > 0 ? result[0] : null;
 };
 
 export const retrieveByApiKeyHash = async (
