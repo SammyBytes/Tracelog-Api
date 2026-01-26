@@ -1911,14 +1911,14 @@ var Hono = class _Hono {
    * app.route("/api", app2) // GET /api/user
    * ```
    */
-  route(path, app4) {
+  route(path, app5) {
     const subApp = this.basePath(path);
-    app4.routes.map((r) => {
+    app5.routes.map((r) => {
       let handler;
-      if (app4.errorHandler === errorHandler) {
+      if (app5.errorHandler === errorHandler) {
         handler = r.handler;
       } else {
-        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app4.errorHandler)(c, () => r.handler(c, next))).res, "handler");
+        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app5.errorHandler)(c, () => r.handler(c, next))).res, "handler");
         handler[COMPOSED_HANDLER] = r.handler;
       }
       subApp.#addRoute(r.method, r.path, handler);
@@ -28366,6 +28366,9 @@ init_modules_watch_stub();
 
 // src/modules/account/account.repository.ts
 init_modules_watch_stub();
+var create = /* @__PURE__ */ __name(async (db2, data) => {
+  return await db2.insert(accounts).values(data).onConflictDoNothing().returning();
+}, "create");
 var retrieveByApiKeyHash = /* @__PURE__ */ __name(async (db2, apiKeyHash) => {
   const result = await db2.select().from(accounts).where(eq(accounts.apiKeyHash, apiKeyHash)).limit(1).execute();
   return result.length > 0 ? result[0] : null;
@@ -28416,22 +28419,70 @@ app.post("/sync", async (c) => {
 });
 var sync_api_default = app;
 
-// src/routes.ts
+// src/modules/account/api/account.api.ts
+init_modules_watch_stub();
+
+// src/modules/account/accountRequest.dto.ts
+init_modules_watch_stub();
+var AccountRequestSchema = external_exports.object({
+  name: external_exports.string(),
+  type: external_exports.enum(["user", "organization"]),
+  url: external_exports.url().optional()
+});
+
+// src/modules/account/utils/crypto.utils.ts
+init_modules_watch_stub();
+var generateTracelogKey = /* @__PURE__ */ __name(() => {
+  const buffer = new Uint8Array(32);
+  crypto.getRandomValues(buffer);
+  const randomPart = Array.from(buffer).map((byte) => byte.toString(32).padStart(2, "0")).join("");
+  return `tl_${randomPart}`;
+}, "generateTracelogKey");
+
+// src/modules/account/api/account.api.ts
 var app2 = new Hono2();
-app2.route("/webhooks/github", sync_api_default);
-var routes_default = app2;
+app2.post("/", async (c) => {
+  const payload = await c.req.json();
+  if (!payload) {
+    return c.json({ error: "Invalid payload" }, 400);
+  }
+  const { data, success: success2, error: error48 } = await AccountRequestSchema.safeParseAsync(payload);
+  if (!success2) {
+    return c.json({ error: error48.message }, 400);
+  }
+  console.debug("Received payload:", data);
+  const fullPayload = {
+    ...payload,
+    apiKeyHash: generateTracelogKey()
+  };
+  try {
+    const database = db(c.env);
+    const result = await create(database, fullPayload);
+    return c.json(result);
+  } catch (error49) {
+    console.error("Error creating account:", error49);
+    return c.json({ error: "Failed to create account" }, 500);
+  }
+});
+var account_api_default = app2;
+
+// src/routes.ts
+var app3 = new Hono2();
+app3.route("/webhooks/github", sync_api_default);
+app3.route("/accounts", account_api_default);
+var routes_default = app3;
 
 // src/index.ts
-var app3 = new Hono2();
-app3.route("/api", routes_default);
-app3.get("/", (c) => {
+var app4 = new Hono2();
+app4.route("/api", routes_default);
+app4.get("/", (c) => {
   return c.json({
     message: "Trace-Log API Online"
   });
 });
 var src_default = {
   port: 1234,
-  fetch: app3.fetch
+  fetch: app4.fetch
 };
 
 // node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
