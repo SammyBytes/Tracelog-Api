@@ -21,9 +21,6 @@ app.post(
   }),
   async (c) => {
     const data = c.req.valid("json");
-
-    console.debug("Received payload:", data);
-
     const apiKey = generateTracelogKey();
 
     const accountToInsert: NewAccount = {
@@ -33,10 +30,11 @@ app.post(
 
     try {
       const database = db(c.env);
-      const result = await create(database, accountToInsert);
+      const insertedAccount = await create(database, accountToInsert);
+      const { apiKeyHash, createdAt, ...publicAccount } = insertedAccount as NewAccount;
       return c.json(
         {
-          account: result,
+          account: publicAccount,
           apiKey: apiKey,
         },
         201,
