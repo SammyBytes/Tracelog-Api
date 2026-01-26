@@ -14,10 +14,12 @@ export const retrieveByApiKeyHash = async (
   db: DatabaseOrTransaction,
   apiKeyHash: string,
 ) => {
-  return await db
+  const result = await db
     .select()
     .from(accounts)
     .where(eq(accounts.apiKeyHash, apiKeyHash))
     .limit(1)
     .execute();
+
+  return result.length > 0 ? result[0] : null;
 };

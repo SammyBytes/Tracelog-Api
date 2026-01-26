@@ -17,7 +17,6 @@ app.post("/sync", async (c) => {
   }
 
   const account = c.get("account");
-  console.debug("Account ID:", account.id);
 
   const { url, createdAt, ...accountWithoutKey } = account;
   const fullPayload = {

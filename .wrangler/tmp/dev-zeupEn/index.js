@@ -712,10 +712,10 @@ var require_promise_limit = __commonJS({
   }
 });
 
-// .wrangler/tmp/bundle-5fa40T/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-rUdBfO/middleware-loader.entry.ts
 init_modules_watch_stub();
 
-// .wrangler/tmp/bundle-5fa40T/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-rUdBfO/middleware-insertion-facade.js
 init_modules_watch_stub();
 
 // src/index.ts
@@ -28271,9 +28271,15 @@ var commitFiles = sqliteTable("commit_files", {
 });
 
 // src/modules/project/projects.repository.ts
-var createProject = /* @__PURE__ */ __name(async (db2, data) => {
-  return await db2.insert(projects).values(data).onConflictDoNothing().returning();
-}, "createProject");
+var upsertProject = /* @__PURE__ */ __name(async (db2, data) => {
+  return await db2.insert(projects).values(data).onConflictDoUpdate({
+    target: projects.id,
+    set: {
+      name: data.name,
+      url: data.url
+    }
+  }).returning();
+}, "upsertProject");
 
 // src/modules/author/author.repository.ts
 init_modules_watch_stub();
@@ -28319,10 +28325,11 @@ var bulkInsertFiles = /* @__PURE__ */ __name(async (db2, data) => {
 var syncGithubPayload = /* @__PURE__ */ __name(async (db2, input) => {
   const { type, module, message } = parseCommit(input.fullMessage);
   return await db2.transaction(async (tx) => {
-    await createProject(tx, {
+    await upsertProject(tx, {
       id: input.project.id,
       name: input.project.name,
-      url: input.project.url
+      url: input.project.url,
+      accountId: input.account.id
     });
     await createAuthor(tx, {
       id: input.author.id,
@@ -28360,7 +28367,8 @@ init_modules_watch_stub();
 // src/modules/account/account.repository.ts
 init_modules_watch_stub();
 var retrieveByApiKeyHash = /* @__PURE__ */ __name(async (db2, apiKeyHash) => {
-  return await db2.select().from(accounts).where(eq(accounts.apiKeyHash, apiKeyHash)).limit(1).execute();
+  const result = await db2.select().from(accounts).where(eq(accounts.apiKeyHash, apiKeyHash)).limit(1).execute();
+  return result.length > 0 ? result[0] : null;
 }, "retrieveByApiKeyHash");
 
 // src/modules/sync/api/middlewares/validationKey.middleware.ts
@@ -28376,7 +28384,7 @@ var validationKeyMiddleware = /* @__PURE__ */ __name(async (c, next) => {
     return c.json({ error: "Invalid validation key" }, 400);
   }
   console.debug("Validation key validated!");
-  c.set("account", account[0]);
+  c.set("account", account);
   return next();
 }, "validationKeyMiddleware");
 
@@ -28390,7 +28398,6 @@ app.post("/sync", async (c) => {
     return c.json({ error: "Invalid payload" }, 400);
   }
   const account = c.get("account");
-  console.debug("Account ID:", account.id);
   const { url: url2, createdAt, ...accountWithoutKey } = account;
   const fullPayload = {
     ...payload,
@@ -28470,7 +28477,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-5fa40T/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-rUdBfO/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -28503,7 +28510,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-5fa40T/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-rUdBfO/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

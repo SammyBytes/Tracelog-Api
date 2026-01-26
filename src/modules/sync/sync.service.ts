@@ -1,6 +1,6 @@
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import type { GitHubSyncInput } from "./sync.dto";
-import { createProject } from "@modules/project/projects.repository";
+import { upsertProject } from "@modules/project/projects.repository";
 import { createAuthor } from "@modules/author/author.repository";
 import { createCommit } from "@modules/commit/commit.repository";
 import { parseCommit } from "@core/parser";
@@ -13,10 +13,11 @@ export const syncGithubPayload = async (
   const { type, module, message } = parseCommit(input.fullMessage);
 
   return await db.transaction(async (tx) => {
-    await createProject(tx, {
+    await upsertProject(tx, {
       id: input.project.id,
       name: input.project.name,
       url: input.project.url,
+      accountId: input.account.id,
     });
 
     await createAuthor(tx, {

@@ -18,6 +18,6 @@ export const validationKeyMiddleware = async (c: Context, next: Next) => {
   }
 
   console.debug("Validation key validated!");
-  c.set("account", account[0]);
+  c.set("account", account);
   return next();
 };
