@@ -7,7 +7,8 @@
     "dev": "wrangler dev",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "act:event": "act pull_request -e seeds/event.json --network host -P ubuntu-latest=catthehacker/ubuntu:act-latest -s API_URL=http://localhost:8787/api/webhooks/github/sync -s TRACELOG_TOKEN=tl_test_122"
   },
   "devDependencies": {
     "@types/bun": "latest",

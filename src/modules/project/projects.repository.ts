@@ -6,13 +6,19 @@ import type { DatabaseOrTransaction } from "@db/types";
  * @param data Project data to insert
  * @returns Newly created project
  */
-export const createProject = async (
+export const upsertProject = async (
   db: DatabaseOrTransaction,
   data: typeof projects.$inferInsert,
 ) => {
   return await db
     .insert(projects)
     .values(data)
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: projects.id,
+      set: {
+        name: data.name,
+        url: data.url,
+      },
+    })
     .returning();
 };
