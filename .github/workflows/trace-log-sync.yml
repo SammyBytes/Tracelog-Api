@@ -14,6 +14,11 @@ jobs:
           # Build payload
           cat <<EOF > payload.json
           {
+            "account": {
+              "id": "${{ github.event.repository.owner.id }}",
+              "name": "${{ github.event.repository.owner.login }}",
+              "type": "${{ github.event.repository.owner.type }}"
+            },
             "project": {
               "id": "${{ github.event.repository.id }}",
               "name": "${{ github.event.repository.name }}",
@@ -32,5 +37,6 @@ jobs:
           EOF
 
           curl -X POST "${{ secrets.API_URL }}" \
+          -H "X-Tracelog-Validation-Key: ${{ secrets.TRACELOG_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d @payload.json

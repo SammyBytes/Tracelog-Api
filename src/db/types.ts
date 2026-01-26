@@ -1,4 +1,4 @@
-import { projects, authors, commits, commitFiles } from "./schema";
+import { projects, authors, commits, commitFiles, accounts } from "./schema";
 import {
   SQLiteTransaction,
   BaseSQLiteDatabase as SQLiteDatabase,
@@ -6,8 +6,11 @@ import {
 
 export type NewProject = typeof projects.$inferInsert;
 export type NewAuthor = typeof authors.$inferInsert;
+export type NewAccount = typeof accounts.$inferInsert;
 export type NewCommit = typeof commits.$inferInsert;
 export type NewCommitFile = typeof commitFiles.$inferInsert;
+
+export type SelectAccount = typeof accounts.$inferSelect;
 
 export type DatabaseOrTransaction =
   | SQLiteDatabase<"async", any, any, any>

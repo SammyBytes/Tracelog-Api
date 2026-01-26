@@ -1,12 +1,22 @@
 import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
-import { ulid } from "ulid";
-import type { id } from "zod/v4/locales";
+
+export const accounts = sqliteTable("accounts", {
+  id: text("id").primaryKey(), // Id of the account (User ID or Organization ID)
+  name: text("name").notNull(),
+  type: text("type").notNull(), // user or organization
+  url: text("url"),
+  apiKeyHash: text("api_key_hash").unique().notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date(),
+  ),
+});
 
 /**
  * Database schema definition for Tracelog application
  */
 export const projects = sqliteTable("projects", {
   id: text("id").primaryKey(),
+  accountId: text("account_id").references(() => accounts.id),
   name: text("name").notNull(),
   url: text("url"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
