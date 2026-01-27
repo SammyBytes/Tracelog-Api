@@ -1,11 +1,11 @@
 import { db } from "@db/client";
 import { Hono } from "hono";
-import type { Bindings, Variables } from "src/types";
+import type { Variables } from "src/types";
 import { GitHubSyncSchema } from "./sync.dto";
 import { syncGithubPayload } from "./sync.service";
-import { validationKeyMiddleware } from "./api/middlewares/validationKey.middleware";
+import { validationKeyMiddleware } from "./api/middlewares/api-key.middleware";
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
 
 app.use(validationKeyMiddleware);
 

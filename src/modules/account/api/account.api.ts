@@ -1,49 +1,44 @@
 import { db } from "@db/client";
 import { Hono } from "hono";
-import type { Bindings, Variables } from "src/types";
-import { AccountRequestSchema } from "../accountRequest.dto";
-import { create } from "../account.repository";
+import type { Variables } from "src/types";
+import { updateApiKey } from "../account.repository";
 import { generateTracelogKey } from "../utils/crypto.utils";
-import { validator } from "hono/validator";
-import z from "zod";
-import type { NewAccount } from "@db/types";
+import { authMiddleware } from "@middlewares/auth.middleware";
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
 
-app.post(
-  "/",
-  validator("json", (value, c) => {
-    const parsed = AccountRequestSchema.safeParse(value);
-    if (!parsed.success) {
-      return c.json({ error: z.formatError(parsed.error) }, 400);
-    }
-    return parsed.data;
-  }),
-  async (c) => {
-    const data = c.req.valid("json");
-    const apiKey = generateTracelogKey();
+app.get("/test", async (c) => {
+  if (c.env.NODE_ENV === "production") {
+    return c.notFound();
+  }
 
-    const accountToInsert: NewAccount = {
-      ...data,
-      apiKeyHash: apiKey,
-    };
+  const { retrievePlaygroundHtml } = await import(
+    "../../../libs/better-auth/playground"
+  );
+  return c.html(retrievePlaygroundHtml());
+});
 
-    try {
-      const database = db(c.env);
-      const insertedAccount = await create(database, accountToInsert);
-      const { apiKeyHash, createdAt, ...publicAccount } = insertedAccount as NewAccount;
-      return c.json(
-        {
-          account: publicAccount,
-          apiKey: apiKey,
-        },
-        201,
-      );
-    } catch (error) {
-      console.error("Error creating account:", error);
-      return c.json({ error: "Failed to create account" }, 500);
-    }
-  },
-);
+app.get("/me", authMiddleware, (c) => {
+  const user = c.get("user");
+  return c.json(user);
+});
+
+app.post("/generate-api-key", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const newKey = generateTracelogKey();
+
+  try {
+    const database = db(c.env);
+
+    await updateApiKey(database, user.id, newKey);
+
+    return c.json({
+      message: "API Key generated successfully",
+      apiKey: newKey,
+    });
+  } catch (error) {
+    return c.json({ error: "Failed to generate key" }, 500);
+  }
+});
 
 export default app;
