@@ -8,7 +8,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "act:event": "act pull_request -e seeds/event.json --network host -P ubuntu-latest=catthehacker/ubuntu:act-latest -s API_URL=http://localhost:8787/api/webhooks/github/sync -s TRACELOG_TOKEN=tl_test_122"
+    "act:event": "act pull_request -e seeds/event.json --network host -P ubuntu-latest=catthehacker/ubuntu:act-latest -s API_URL=http://localhost:8787/api/webhooks/github/sync -s TRACELOG_TOKEN=tl_5m471a244o7n7p2l490s165r233d6q2l447q5h32230u6c3q2c1s023b49606i6i"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@libsql/client": "0.17.0",
+    "better-auth": "^1.4.17",
     "drizzle-orm": "0.45.1",
     "hono": "4.11.4",
     "ulid": "3.0.2",
