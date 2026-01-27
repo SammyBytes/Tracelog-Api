@@ -2,12 +2,29 @@ import { eq } from "drizzle-orm";
 import type { DatabaseOrTransaction, NewAccount } from "@db/types";
 import { accounts } from "@db/schema";
 
-export const create = async (db: DatabaseOrTransaction, data: NewAccount) => {
-  return await db
-    .insert(accounts)
-    .values(data)
-    .onConflictDoNothing()
-    .returning();
+export const updateApiKey = async (
+  db: DatabaseOrTransaction,
+  accountId: string,
+  apiKeyHash: string,
+) => {
+  await db
+    .update(accounts)
+    .set({ apiKeyHash })
+    .where(eq(accounts.id, accountId));
+};
+
+export const retrieveByName = async (
+  db: DatabaseOrTransaction,
+  name: string,
+) => {
+  const result = await db
+    .select()
+    .from(accounts)
+    .where(eq(accounts.name, name))
+    .limit(1)
+    .execute();
+
+  return result.length > 0 ? result[0] : null;
 };
 
 export const retrieveByApiKeyHash = async (

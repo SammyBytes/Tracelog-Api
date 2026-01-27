@@ -1,11 +1,8 @@
 import type { SelectAccount } from "@db/types";
-
-export type Bindings = {
-  TURSO_DATABASE_URL: string;
-  TURSO_DATABASE_AUTH_TOKEN: string;
-  NODE_ENV: "development" | "production";
-};
+import type { Session, User } from "better-auth";
 
 export type Variables = {
+  user: User;
+  session: Session;
   account: SelectAccount;
 };
