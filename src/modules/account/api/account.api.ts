@@ -4,6 +4,10 @@ import type { Variables } from "src/types";
 import { updateApiKey } from "../account.repository";
 import { generateTracelogKey } from "../utils/crypto.utils";
 import { authMiddleware } from "@middlewares/auth.middleware";
+import { updateApiKeyUsecase } from "../usecases/updateApiKey.usecase";
+import { ProblemDocument } from "http-problem-details";
+import * as HttpStatusCode from "stoker/http-status-codes";
+import type { HTTPException } from "hono/http-exception";
 
 const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
 
@@ -27,18 +31,29 @@ app.post("/generate-api-key", authMiddleware, async (c) => {
   const user = c.get("user");
   const newKey = generateTracelogKey();
 
-  try {
-    const database = db(c.env);
+  const database = db(c.env);
 
-    await updateApiKey(database, user.id, newKey);
-
-    return c.json({
-      message: "API Key generated successfully",
-      apiKey: newKey,
+  var result = await updateApiKeyUsecase(database, user.id, newKey);
+  if (result.isErr()) {
+    const error = result.error as HTTPException;
+    const problem = new ProblemDocument({
+      title: "Error generating API Key",
+      detail: error.message,
+      status: error.status,
+      instance: c.req.path,
     });
-  } catch (error) {
-    return c.json({ error: "Failed to generate key" }, 500);
+
+    const problemJson = JSON.stringify(problem);
+    console.error(problemJson);
+    return new Response(problemJson, {
+      status: error.status,
+    });
   }
+
+  return c.json({
+    message: "API Key generated successfully",
+    apiKey: newKey,
+  });
 });
 
 export default app;
