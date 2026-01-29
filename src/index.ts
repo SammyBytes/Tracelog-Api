@@ -1,8 +1,9 @@
 import { Hono } from "hono";
-import type { Bindings } from "./types";
 import routes from "./routes";
+import { auth } from "./libs/better-auth";
 
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono<{ Bindings: CloudflareBindings }>();
+
 
 app.route("/api", routes);
 

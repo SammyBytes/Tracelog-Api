@@ -22,6 +22,34 @@
       "when": 1769143881839,
       "tag": "0002_ordinary_venom",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1769398679151,
+      "tag": "0003_lumpy_mauler",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1769400570141,
+      "tag": "0004_bright_frog_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1769472659446,
+      "tag": "0005_blue_phantom_reporter",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1769663015967,
+      "tag": "0006_thick_mikhail_rasputin",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,16 @@
 import { z } from "zod";
 
 export const GitHubSyncSchema = z.object({
+  account: z.object({
+    id: z.string(),
+    name: z.string(),
+    type: z.preprocess(
+      (val) => String(val).toLowerCase(),
+      z.enum(["user", "organization"]),
+    ),
+    url: z.url().optional(),
+    apiKeyHash: z.string(),
+  }),
   project: z.object({
     id: z.string(),
     name: z.string(),

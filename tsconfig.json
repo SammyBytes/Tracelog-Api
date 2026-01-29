@@ -8,11 +8,13 @@
     "jsx": "react-jsx",
     "allowJs": true,
 
+    "types": ["./worker-configuration.d.ts"],
     "baseUrl": ".",
     "paths": {
       "@core/*": ["src/core/*"],
       "@db/*": ["src/db/*"],
-      "@modules/*": ["src/modules/*"]
+      "@modules/*": ["src/modules/*"],
+      "@middlewares/*": ["src/middlewares/*"]
     },
 
     // Bundler mode
