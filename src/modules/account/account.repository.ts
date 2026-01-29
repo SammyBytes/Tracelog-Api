@@ -1,16 +1,20 @@
 import { eq } from "drizzle-orm";
 import type { DatabaseOrTransaction, NewAccount } from "@db/types";
 import { accounts } from "@db/schema";
+import type { ResultSet } from "@libsql/client";
 
 export const updateApiKey = async (
   db: DatabaseOrTransaction,
   accountId: string,
   apiKeyHash: string,
 ) => {
-  await db
+  const result = (await db
     .update(accounts)
     .set({ apiKeyHash })
-    .where(eq(accounts.id, accountId));
+    .where(eq(accounts.id, accountId))
+    .execute()) as unknown as ResultSet;
+
+  return result.rowsAffected > 0;
 };
 
 export const retrieveByName = async (
