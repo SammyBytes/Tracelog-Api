@@ -2,7 +2,10 @@ import type { Context, Next } from "hono";
 import { retrieveById } from "@modules/account/account.repository";
 import { db } from "@db/client";
 import { verifyApiKey } from "@modules/account/utils/crypto.utils";
-import { ProblemDocument } from "http-problem-details";
+import {
+  ProblemDocumentExtension,
+  ProblemDocument,
+} from "http-problem-details";
 import { NOT_FOUND } from "stoker/http-status-codes";
 
 const headerApiKey = "X-Tracelog-API-Key";
@@ -13,7 +16,30 @@ export const validationKeyMiddleware = async (c: Context, next: Next) => {
   const accountId = c.req.header(headerAccountId);
 
   if (!apiKey || !accountId) {
-    return c.json({ error: "Missing authentication headers" }, 401);
+    const record: Record<string, string> = {};
+
+    if (!apiKey) {
+      record["X-Tracelog-API-Key"] = "Missing";
+    }
+
+    if (!accountId) {
+      record["X-Tracelog-Account-Id"] = "Missing";
+    }
+
+    const problem = new ProblemDocument(
+      {
+        title: "Missing authentication headers",
+        detail: "Missing authentication headers",
+        status: NOT_FOUND,
+        instance: c.req.path,
+      },
+      new ProblemDocumentExtension(record),
+    );
+    const problemJson = JSON.stringify(problem);
+    console.error(problemJson);
+    return new Response(problemJson, {
+      status: NOT_FOUND,
+    });
   }
 
   const account = await retrieveById(db(c.env), accountId);
