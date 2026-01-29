@@ -43,6 +43,13 @@
       "when": 1769472659446,
       "tag": "0005_blue_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1769663015967,
+      "tag": "0006_thick_mikhail_rasputin",
+      "breakpoints": true
     }
   ]
 }

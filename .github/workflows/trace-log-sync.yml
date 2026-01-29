@@ -38,5 +38,6 @@ jobs:
 
           curl -X POST "${{ secrets.API_URL }}" \
           -H "X-Tracelog-Validation-Key: ${{ secrets.TRACELOG_TOKEN }}" \
+          -H "X-Tracelog-Account-Id: ${{ github.event.repository.owner.id }}" \
           -H "Content-Type: application/json" \
           -d @payload.json

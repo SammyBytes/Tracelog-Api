@@ -1,23 +1,74 @@
 import type { Context, Next } from "hono";
-import { retrieveByApiKeyHash } from "@modules/account/account.repository";
+import { retrieveById } from "@modules/account/account.repository";
 import { db } from "@db/client";
+import { verifyApiKey } from "@modules/account/utils/crypto.utils";
+import { ProblemDocument } from "http-problem-details";
+import { NOT_FOUND } from "stoker/http-status-codes";
 
-const headerValidationKey = "X-Tracelog-Validation-Key";
+const headerApiKey = "X-Tracelog-API-Key";
+const headerAccountId = "X-Tracelog-Account-Id";
 
 export const validationKeyMiddleware = async (c: Context, next: Next) => {
-  console.debug("Validating request...");
+  const apiKey = c.req.header(headerApiKey);
+  const accountId = c.req.header(headerAccountId);
 
-  const validationKey = c.req.header(headerValidationKey);
-  if (!validationKey) {
-    return c.json({ error: "Missing validation key" }, 400);
+  if (!apiKey || !accountId) {
+    return c.json({ error: "Missing authentication headers" }, 401);
   }
 
-  const account = await retrieveByApiKeyHash(db(c.env), validationKey);
+  const account = await retrieveById(db(c.env), accountId);
+
   if (!account) {
-    return c.json({ error: "Invalid validation key" }, 400);
+    const problem = new ProblemDocument({
+      title: "Account not found",
+      detail: "Account not found",
+      status: NOT_FOUND,
+      instance: c.req.path,
+    });
+
+    const problemJson = JSON.stringify(problem);
+    console.error(problemJson);
+    return new Response(problemJson, {
+      status: NOT_FOUND,
+    });
   }
 
-  console.debug("Validation key validated!");
+  if (!account.apiKeyHash || !account.apiKeySalt) {
+    const problem = new ProblemDocument({
+      title: "Api Key not found",
+      detail: "No API Key found for this account",
+      status: NOT_FOUND,
+      instance: c.req.path,
+    });
+
+    const problemJson = JSON.stringify(problem);
+    console.error(problemJson);
+    return new Response(problemJson, {
+      status: NOT_FOUND,
+    });
+  }
+
+  const isValid = await verifyApiKey(
+    apiKey,
+    account.apiKeyHash,
+    account.apiKeySalt,
+  );
+
+  if (!isValid) {
+    const problem = new ProblemDocument({
+      title: "Invalid API Key",
+      detail: "API Key is invalid, please generate a new one",  
+      status: NOT_FOUND,
+      instance: c.req.path,
+    });
+
+    const problemJson = JSON.stringify(problem);
+    console.error(problemJson);
+    return new Response(problemJson, {
+      status: NOT_FOUND,
+    });
+  }
+
   c.set("account", account);
-  return next();
+  await next();
 };

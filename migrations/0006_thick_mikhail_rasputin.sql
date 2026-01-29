@@ -1,0 +1,1 @@
+ALTER TABLE `accounts` ADD `api_key_salt` text;
