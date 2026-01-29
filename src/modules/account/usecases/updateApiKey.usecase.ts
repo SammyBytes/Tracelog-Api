@@ -3,14 +3,19 @@ import { Result, ok, err } from "neverthrow";
 import { updateApiKey } from "../account.repository";
 import { HTTPException } from "hono/http-exception";
 import { NOT_FOUND } from "stoker/http-status-codes";
+import { generateTracelogKey, hashApiKey } from "../utils/crypto.utils";
 
 export const updateApiKeyUsecase = async (
   dbContext: DatabaseOrTransaction,
   accountId: string,
-  apiKeyHash: string,
 ): Promise<Result<undefined, Error>> => {
   try {
-    const wasUpdated = await updateApiKey(dbContext, accountId, apiKeyHash);
+    const newKey = generateTracelogKey();
+    const salt = crypto.randomUUID();
+
+    const hashedKey = await hashApiKey(newKey, salt);
+
+    const wasUpdated = await updateApiKey(dbContext, accountId, hashedKey, salt);
 
     if (!wasUpdated) {
       return err(

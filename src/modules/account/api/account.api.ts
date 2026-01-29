@@ -29,11 +29,10 @@ app.get("/me", authMiddleware, (c) => {
 
 app.post("/generate-api-key", authMiddleware, async (c) => {
   const user = c.get("user");
-  const newKey = generateTracelogKey();
 
   const database = db(c.env);
 
-  var result = await updateApiKeyUsecase(database, user.id, newKey);
+  var result = await updateApiKeyUsecase(database, user.id);
   if (result.isErr()) {
     const error = result.error as HTTPException;
     const problem = new ProblemDocument({
@@ -52,7 +51,7 @@ app.post("/generate-api-key", authMiddleware, async (c) => {
 
   return c.json({
     message: "API Key generated successfully",
-    apiKey: newKey,
+    apiKey: result.value,
   });
 });
 

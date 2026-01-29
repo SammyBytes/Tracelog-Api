@@ -12,6 +12,7 @@ export const accounts = sqliteTable("accounts", {
   type: text("type").notNull().default("user"), // user or organization
   url: text("url"),
   apiKeyHash: text("api_key_hash").unique(),
+  apiKeySalt: text("api_key_salt"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),
