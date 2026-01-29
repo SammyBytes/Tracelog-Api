@@ -8,7 +8,7 @@ import { generateTracelogKey, hashApiKey } from "../utils/crypto.utils";
 export const updateApiKeyUsecase = async (
   dbContext: DatabaseOrTransaction,
   accountId: string,
-): Promise<Result<undefined, Error>> => {
+): Promise<Result<string, Error>> => {
   try {
     const newKey = generateTracelogKey();
     const salt = crypto.randomUUID();
@@ -26,7 +26,7 @@ export const updateApiKeyUsecase = async (
     }
     console.log("Account updated");
 
-    return ok(undefined);
+    return ok(newKey);
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
