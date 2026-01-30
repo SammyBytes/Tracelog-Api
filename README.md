@@ -68,9 +68,23 @@ Perfect. Here is the updated **Roadmap** and **Current Implementation** sections
 * [x] **Secure Key Storage:** Implementation of SHA-256 hashing + Salts for API key persistence in TursoDB.
 * [x] **Origin Validation:** Middleware to verify that incoming data belongs to a registered Organization via its API Key.
 
+> ⚠️ **Note:** API Key–based authentication was implemented as an initial, pragmatic solution to validate ingestion flows.
+> It is now considered **legacy** and is being progressively replaced by an OIDC-based identity model.
+
+### Phase 2.1: OIDC-Based Workload Identity (CI/CD) `[PLANNED / IN PROGRESS]`
+
+*This phase upgrades machine-to-machine authentication by replacing static secrets with short-lived, verifiable identities.*
+
+* [ ] **GitHub Actions OIDC Integration:** Enable OpenID Connect token issuance for ingestion workflows.
+* [ ] **JWT Verification Middleware:** Cryptographic validation of GitHub-issued OIDC tokens using public JWKS.
+* [ ] **Claim-Based Authorization:** Fine-grained validation based on repository owner, repository name, branch, and workflow identity.
+* [ ] **Stateless Organization Mapping:** Organization resolution derived from verified token claims (no API keys required).
+* [ ] **API Key Deprecation Strategy:** Gradual phase-out of static API keys while maintaining backward compatibility.
+
+
 ### Phase 3: Identity & User Session Management (Web Auth) `[IN PROGRESS]`
 
-*This phase manages access for human users via the browser/frontend.*
+> *This phase is strictly scoped to **human users** and explicitly excludes machine-to-machine authentication, which is handled via OIDC in the ingestion layer.*
 
 * [x] **Better-Auth Integration:** OAuth (GitHub) configuration for user login.
 * [x] **User-Session vs. API-Key Separation:** Decoupling session-based authentication (Cookies/JWT) for the UI from key-based auth for the Ingestion Engine.
