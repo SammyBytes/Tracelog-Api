@@ -1,5 +1,6 @@
 import { projects } from "@db/schema";
 import type { DatabaseOrTransaction } from "@db/types";
+import { eq } from "drizzle-orm";
 /**
  * Create a new project in the database
  * @param db LibSQLDatabase instance
@@ -21,4 +22,16 @@ export const upsertProject = async (
       },
     })
     .returning();
+};
+
+export const retrieveByRepoId = async (
+  db: DatabaseOrTransaction,
+  repoId: string,
+) => {
+  const result = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.githubRepo, repoId))
+    .get();
+  return result;
 };

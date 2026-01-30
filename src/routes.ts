@@ -3,7 +3,7 @@ import syncApi from "@modules/sync/sync.api";
 import accountApi from "@modules/account/api/account.api";
 import { auth as getAuth } from "./libs/better-auth";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+const app = new Hono<{ Bindings: Cloudflare.Env }>();
 
 app.on(["POST", "GET"], "/auth/*", (c) => {
   const auth = getAuth(c.env);

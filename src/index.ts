@@ -2,8 +2,7 @@ import { Hono } from "hono";
 import routes from "./routes";
 import { auth } from "./libs/better-auth";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
-
+const app = new Hono<{ Bindings: Cloudflare.Env }>();
 
 app.route("/api", routes);
 

@@ -4,7 +4,7 @@ import { betterAuth } from "better-auth";
 import { betterAuthOptions } from "./options";
 import * as schema from "@db/schema"; 
 
-export const auth = (env: CloudflareBindings) =>
+export const auth = (env: Cloudflare.Env) =>
   betterAuth({
     ...betterAuthOptions,
     database: drizzleAdapter(db(env), {
@@ -21,7 +21,6 @@ export const auth = (env: CloudflareBindings) =>
     user: {
       modelName: "accounts",
       additionalFields: {
-        apiKeyHash: { type: "string", required: false },
         type: { type: "string", required: false },
         url: { type: "string", required: false },
       },

@@ -1,43 +1,61 @@
-name: Trace-Log Sync
-on:
-  pull_request:
-    types: [closed]
-    branches: [dev]
+  name: Trace-Log Sync
+  on:
+    pull_request:
+      types: [closed]
+      branches: [dev]
 
-jobs:
-  sync:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send to Trace-Log
-        run: |
-          # Build payload
-          cat <<EOF > payload.json
-          {
-            "account": {
-              "id": "${{ github.event.repository.owner.id }}",
-              "name": "${{ github.event.repository.owner.login }}",
-              "type": "${{ github.event.repository.owner.type }}"
-            },
-            "project": {
-              "id": "${{ github.event.repository.id }}",
-              "name": "${{ github.event.repository.name }}",
-              "url": "${{ github.event.repository.html_url }}"
-            },
-            "hash": "${{ github.event.pull_request.merge_commit_sha }}",
-            "author": {
-              "id": "${{ github.event.pull_request.user.id }}",
-              "name": "${{ github.event.pull_request.user.login }}",
-              "avatarUrl": "${{ github.event.pull_request.user.avatar_url }}"
-            },
-            "fullMessage": "${{ github.event.pull_request.title }}",
-            "prNumber": ${{ github.event.pull_request.number }},
-            "files": []
-          }
-          EOF
+  permissions: 
+    id-token: write
+    contents: read
 
-          curl -X POST "${{ secrets.API_URL }}" \
-          -H "X-Tracelog-API-Key: ${{ secrets.TRACELOG_TOKEN }}" \
-          -H "X-Tracelog-Account-Id: ${{ secrets.TRACELOG_ACCOUNT_ID }}" \
-          -H "Content-Type: application/json" \
-          -d @payload.json
+  jobs:
+    sync:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+      steps:
+        - name: Sync to Trace-Log
+          uses: actions/github-script@v7
+          with:
+            script: |
+              // 1. Obtener el Token OIDC de forma nativa
+              const id_token = await core.getIDToken("tracelog-api"); 
+
+              // 2. Construir el Payload de forma segura (sin errores de comillas)
+              const payload = {
+                account: {
+                  id: String(context.payload.repository.owner.id),
+                  name: context.payload.repository.owner.login,
+                  type: context.payload.repository.owner.type
+                },
+                project: {
+                  id: String(context.payload.repository.id),
+                  name: context.payload.repository.name,
+                  url: context.payload.repository.html_url
+                },
+                hash: context.payload.pull_request.merge_commit_sha,
+                author: {
+                  id: String(context.payload.pull_request.user.id),
+                  name: context.payload.pull_request.user.login,
+                  avatarUrl: context.payload.pull_request.user.avatar_url
+                },
+                fullMessage: context.payload.pull_request.title,
+                prNumber: context.payload.pull_request.number,
+                files: []
+              };
+
+              // 3. Enviar a tu API
+              const response = await fetch("${{ secrets.API_URL }}", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${id_token}`
+                },
+                body: JSON.stringify(payload)
+              });
+
+              if (!response.ok) {
+                const error = await response.text();
+                core.setFailed(`Sync failed: ${error}`);
+              } else {
+                core.info("Sync successful!");
+              }

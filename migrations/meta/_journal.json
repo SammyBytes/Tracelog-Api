@@ -50,6 +50,13 @@
       "when": 1769663015967,
       "tag": "0006_thick_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1769752293617,
+      "tag": "0007_careful_kingpin",
+      "breakpoints": true
     }
   ]
 }

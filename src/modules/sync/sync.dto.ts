@@ -9,7 +9,6 @@ export const GitHubSyncSchema = z.object({
       z.enum(["user", "organization"]),
     ),
     url: z.url().optional(),
-    apiKeyHash: z.string(),
   }),
   project: z.object({
     id: z.string(),

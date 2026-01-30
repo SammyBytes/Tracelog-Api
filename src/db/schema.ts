@@ -11,8 +11,6 @@ export const accounts = sqliteTable("accounts", {
 
   type: text("type").notNull().default("user"), // user or organization
   url: text("url"),
-  apiKeyHash: text("api_key_hash").unique(),
-  apiKeySalt: text("api_key_salt"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),
@@ -27,6 +25,7 @@ export const accounts = sqliteTable("accounts", {
 export const projects = sqliteTable("projects", {
   id: text("id").primaryKey(),
   accountId: text("account_id").references(() => accounts.id),
+  githubRepo: text("github_repo").unique(),
   name: text("name").notNull(),
   url: text("url"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
