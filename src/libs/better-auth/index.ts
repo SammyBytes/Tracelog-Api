@@ -2,7 +2,7 @@ import { db } from "@db/client";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth";
 import { betterAuthOptions } from "./options";
-import * as schema from "@db/schema"; 
+import * as schema from "@db/schema";
 
 export const auth = (env: Cloudflare.Env) =>
   betterAuth({
@@ -16,6 +16,7 @@ export const auth = (env: Cloudflare.Env) =>
         verifications: schema.verifications,
       },
     }),
+
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     user: {
@@ -38,6 +39,7 @@ export const auth = (env: Cloudflare.Env) =>
       github: {
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET,
+        scope: ["repo", "read:org", "user"],
       },
     },
   });

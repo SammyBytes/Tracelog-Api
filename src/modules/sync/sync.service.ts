@@ -46,3 +46,4 @@ export const syncGithubPayload = async (
     return { success: true, hash: input.hash };
   });
 };
+
