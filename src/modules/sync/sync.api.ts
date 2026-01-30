@@ -39,8 +39,16 @@ app.post("/sync", async (c) => {
   }
 
   console.debug("Parsed payload:", isParsed.data);
+
+  const projectId = c.get("projectId");
+
+  console.debug("projectId", projectId);
+
+  const data = isParsed.data;
+  data.project.id = projectId;
+
   try {
-    const result = await syncGithubPayload(database, isParsed.data);
+    const result = await syncGithubPayload(database, data);
     return c.json({
       message: "Sync successful",
       result,

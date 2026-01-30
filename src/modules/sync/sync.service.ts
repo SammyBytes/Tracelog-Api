@@ -13,12 +13,6 @@ export const syncGithubPayload = async (
   const { type, module, message } = parseCommit(input.fullMessage);
 
   return await db.transaction(async (tx) => {
-    await upsertProject(tx, {
-      id: input.project.id,
-      name: input.project.name,
-      url: input.project.url,
-      accountId: input.account.id,
-    });
 
     await createAuthor(tx, {
       id: input.author.id,

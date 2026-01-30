@@ -12,8 +12,6 @@ export const GitHubSyncSchema = z.object({
   }),
   project: z.object({
     id: z.string(),
-    name: z.string(),
-    url: z.url(),
   }),
   hash: z.string(), // Merge hash of the PR
   author: z.object({

@@ -86,5 +86,7 @@ export const validationKeyMiddleware = async (
     });
   }
 
+  c.set("projectId", project.id);
+
   await next();
 };
